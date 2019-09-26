@@ -727,7 +727,7 @@ if __name__ == '__main__':
 			sys.exit()
 
 		assert args.weights.endswith('.npy')
-		run_image(Model(), DictRestore(np.load(args.weights, encoding='latin1').item()), args.run)
+		run_image(Model(), DictRestore(np.load(args.weights, encoding='latin1', allow_pickle=True).item()), args.run)
 
 	elif args.dump2_train1_test0 == '2':
 		if args.meta == None:
@@ -748,4 +748,4 @@ if __name__ == '__main__':
 			sys.exit()
 
 		assert args.weights.endswith('.npy')
-		run_single_image(Model(), DictRestore(np.load(args.weights, encoding='latin1').item()), args.run)
+                run_single_image(Model(), DictRestore(np.load(args.weights, encoding='latin1', allow_pickle=True).item()), args.run)

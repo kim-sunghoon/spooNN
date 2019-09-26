@@ -1,2 +1,14 @@
 *.pyc
 *.log
+
+output/
+*.npy
+
+*.jou
+
+repo/
+train_log/
+*.bak/
+*.bak
+
+NA/
