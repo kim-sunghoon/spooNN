@@ -22,8 +22,8 @@
 #define AP_INT_MAX_W 16384
 
 #include "hls-nn-lib.h"
-#include "../training/mnist-cnn-config-1W5A.h"
-#include "../training/mnist-cnn-params-1W5A.h"
+#include "../training/mnist-cnn-config.h"
+#include "../training/mnist-cnn-params.h"
 
 void DoCompute(stream<ap_axis >& in, stream<ap_axis >& out, const unsigned int numReps) {
 #pragma HLS INTERFACE axis register both port=out
