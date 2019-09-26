@@ -83,12 +83,17 @@ Now, the repo directory can be included in Vivado and the IP we generated can be
 1. We have a script to generate a final bitstream using this IP: /path/to/spooNN/mnist-cnn$ `./scripts/make_bitstream.sh /path/to/spooNN/mnist-cnn`
 2. This will take a while (around 30 minutes). After it is finished, find the generated bitstream in `/path/to/spooNN/mnist-cnn/output/pynq-vivado/pynq-vivado.runs/impl_1/procsys_wrapper.bit`
 
-Besides the bitstream, you also need a `.tcl` file that describes the overlay. You can generate that by opening the pynq-vivado project with Vivado. Open the block design procsys. Then do `File->Export->Export Block Design`. This is the same file that is readily available at `./scripts/procsys.tcl`
+Besides the bitstream, you also need a `.hwh` file that describes the overlay. 
+3. You can find hw_handoff file at `$Path_To_Your_RTL_Project/$Project_Name/$Project_Name.srcs/sources_1/bd/design_1/hw_handoff` 
+i.e. `/path/to/spooNN/mnist-cnn/output/pynq-vivado.srcs/sources_1/bd/procsys/hw_handoff/procsys.hwh` 
+
+
+--. You can generate that by opening the pynq-vivado project with Vivado. Open the block design procsys. Then do `File->Export->Export Block Design`. This is the same file that is readily available at `./scripts/procsys.tcl` --> deprecated 
 
 ## 4. Deployment on the PYNQ
 
-Now that we have a `bitstream` and a `.tcl file` (together, called an overlay), we show how to deploy it on the PYNQ.
-
+Now that we have a `.bit` and a `.hwh` file (together, called an overlay), we show how to deploy it on the PYNQ. 
+they should be same name and move these to deploy folder 
 1. Follow the guide to bring up you PYNQ (http://pynq.readthedocs.io) and make sure you can connect to it via SSH.
 2. Copy the mnist-cnn/deploy directory to the jupyter_notebooks directory on the PYNQ (assuming the static IP 192.168.2.99): `$ scp -r /path/to/spooNN/mnist-cnn/deploy xilinx@192.168.2.99:/home/xilinx/jupyter_notebooks/`
 3. Then open a browser window and navigate to http://192.168.2.99:9090, to access jupyter notebooks that are on the PYNQ.
