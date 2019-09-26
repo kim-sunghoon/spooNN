@@ -84,11 +84,13 @@ Now, the repo directory can be included in Vivado and the IP we generated can be
 2. This will take a while (around 30 minutes). After it is finished, find the generated bitstream in `/path/to/spooNN/mnist-cnn/output/pynq-vivado/pynq-vivado.runs/impl_1/procsys_wrapper.bit`
 
 Besides the bitstream, you also need a `.hwh` file that describes the overlay. 
+
 3. You can find hw_handoff file at `$Path_To_Your_RTL_Project/$Project_Name/$Project_Name.srcs/sources_1/bd/design_1/hw_handoff` 
+
 i.e. `/path/to/spooNN/mnist-cnn/output/pynq-vivado.srcs/sources_1/bd/procsys/hw_handoff/procsys.hwh` 
 
 
---. You can generate that by opening the pynq-vivado project with Vivado. Open the block design procsys. Then do `File->Export->Export Block Design`. This is the same file that is readily available at `./scripts/procsys.tcl` --> deprecated 
+--. deprecated: You can generate that by opening the pynq-vivado project with Vivado. Open the block design procsys. Then do `File->Export->Export Block Design`. This is the same file that is readily available at `./scripts/procsys.tcl` -->  
 
 ## 4. Deployment on the PYNQ
 
