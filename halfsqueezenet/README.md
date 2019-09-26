@@ -122,12 +122,12 @@ We now have a functionally correct CNN implemented in C, targeting Vivado HLS.
 Now, the repo directory can be included in Vivado and the IP we generated can be instantiated.
 
 1. We have a script to generate a final bitstream using this IP: `/path/to/spooNN/halfsqueezenet$ ./scripts/make_bitstream.sh /path/to/spooNN/halfsqueezenet`
-2. This will take a while (around 30 minutes). After it is finished, find the generated bitstream in /path/to/spooNN/halfsqueezenet/output/pynq-vivado/pynq-vivado.runs/impl_1/procsys_wrapper.bit
+2. This will take a while (around 30 minutes). After it is finished, find the generated bitstream in `/path/to/spooNN/halfsqueezenet/output/pynq-vivado/pynq-vivado.runs/impl_1/procsys_wrapper.bit`
 
 Besides the bitstream, you also need a .hwh file that describes the overlay. 
-3. You can find hw_handoff file at $Path_To_Your_RTL_Project/$Project_Name/$Project_Name.srcs/sources_1/bd/design_1/hw_handoff
+3. You can find hw_handoff file at `$Path_To_Your_RTL_Project/$Project_Name/$Project_Name.srcs/sources_1/bd/design_1/hw_handoff`
 
-i.e. /path/to/spooNN/halfsqueezenet/output/pynq-vivado.srcs/sources_1/bd/procsys/hw_handoff/procsys.hwh
+i.e. `/path/to/spooNN/halfsqueezenet/output/pynq-vivado.srcs/sources_1/bd/procsys/hw_handoff/procsys.hwh`
 
 
 ## 4. Deployment on the PYNQ
