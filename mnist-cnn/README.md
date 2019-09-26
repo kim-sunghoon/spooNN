@@ -19,7 +19,32 @@ If you haven't done so yet, clone the repo and go to the training directory:
 3. `$ cd spooNN/mnist-cnn/training/`
 
 Have a look at the `mnist-cnn.py` script. The CNN that we will train will be quantized (1-bit weights and 5-bit activations).
-
+```python
+276     print('dump2_train1_test0: ' + str(args.dump2_train1_test0) )                                                                                       
+277                                                                                                                                                         
+278     if args.dump2_train1_test0 == '1':                                                                                                                  
+279        MONITOR = 0                                                                                                                                     
+280        logger.auto_set_dir()                                                                                                                           
+281        config = get_config()                                                                                                                           
+282        if args.model:                                                                                                                                  
+283           config.session_init = SaverRestore(args.model)                                                                                              
+284        SimpleTrainer(config).train()                                                                                                                   
+285                                                                                                                                                         
+286     elif args.dump2_train1_test0 == '0':                                                                                                                
+287        if args.weights == None:                                                                                                                        
+288           print('Provide weights file (.npy) for testing!')                                                                                           
+289           sys.exit()                                                                                                                                  
+290        run_test(args.weights, args.testfile)                                                                                                           
+291                                                                                                                                                         
+292     elif args.dump2_train1_test0 == '2':                                                                                                                
+293        if args.meta == None:                                                                                                                           
+294           print('Provide meta file (.meta) for dumping')                                                                                              
+295           sys.exit()                                                                                                                                  
+296        if args.model == None:                                                                                                                          
+297           print('Provide model file (.data-00000-of-00001) for dumping')                                                                              
+298           sys.exit()                                                                                                                                  
+299        dump_weights(args.meta, args.model, args.output)
+```
 Start the training:
 - `$ python ./mnist-cnn.py 1`
 This will take a while. Observe the console output to see how much accuracy is reached on the test set. After 10 epochs, it should be around 98%.
