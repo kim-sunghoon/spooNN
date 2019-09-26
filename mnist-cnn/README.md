@@ -90,7 +90,7 @@ Besides the bitstream, you also need a `.hwh` file that describes the overlay.
 i.e. `/path/to/spooNN/mnist-cnn/output/pynq-vivado.srcs/sources_1/bd/procsys/hw_handoff/procsys.hwh` 
 
 
---. deprecated: You can generate that by opening the pynq-vivado project with Vivado. Open the block design procsys. Then do `File->Export->Export Block Design`. This is the same file that is readily available at `./scripts/procsys.tcl` -->  
+-- deprecated -> You can generate that by opening the pynq-vivado project with Vivado. Open the block design procsys. Then do `File->Export->Export Block Design`. This is the same file that is readily available at `./scripts/procsys.tcl`  
 
 ## 4. Deployment on the PYNQ
 
