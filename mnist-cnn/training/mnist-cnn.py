@@ -156,7 +156,7 @@ def run_test(weights_file, test_file):
     output_names = ['prob']
     output_names.extend(monitor_names)
 
-    param_dict = np.load(weights_file, encoding='latin1').item()
+    param_dict = np.load(weights_file, encoding='latin1', allow_pickle=True).item()
     predictor = OfflinePredictor(PredictConfig(
         model=Model(),
         session_init=DictRestore(param_dict),
@@ -272,6 +272,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
     print('dump2_train1_test0: ' + str(args.dump2_train1_test0) )
 
