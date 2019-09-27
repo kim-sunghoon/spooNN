@@ -36,3 +36,4 @@ if [ -n "$HW_ROOT" ]; then
 else
 	echo "HW_ROOT is NOT set!"
 fi
+
