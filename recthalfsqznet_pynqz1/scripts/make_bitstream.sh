@@ -17,24 +17,22 @@
 #*************************************************************************
 
 if [[ $# -ne 1 ]]; then 
-	echo "Usage: ./make_IP.sh </path/to/network>"
+	echo "Usage: ./make_hw.sh </path/to/network>"
 	exit
 fi
 
-PATH_TO_SCRIPTS=$1/scripts
-PATH_TO_OUTPUT=$1/output
+HW_ROOT=$1
 
-echo "PATH_TO_SCRIPTS: $PATH_TO_SCRIPTS"
-echo "PATH_TO_OUTPUT: $PATH_TO_OUTPUT"
+if [ -n "$HW_ROOT" ]; then
+	echo "HW_ROOT=$HW_ROOT"
 
-if [ ! -d "$PATH_TO_OUTPUT" ]; then
-	mkdir $PATH_TO_OUTPUT
+	SCRIPT_DIR="$HW_ROOT/scripts"
+	IP_REPO="$HW_ROOT/repo"
+
+	PROJ_NAME="pynq-vivado"
+	VIVADO_OUT_DIR="$HW_ROOT/output/$PROJ_NAME"
+	VIVADO_SCRIPT=$SCRIPT_DIR/make-vivado-proj.tcl
+	vivado -mode batch -notrace -source $VIVADO_SCRIPT -tclargs $PROJ_NAME $VIVADO_OUT_DIR $SCRIPT_DIR $IP_REPO
+else
+	echo "HW_ROOT is NOT set!"
 fi
-
-HLS_PROJECT="hls_project"
-HLS_SRC="$1/hls"
-HLS_NN_LIB="$1/../hls-nn-lib"
-
-
-cd $PATH_TO_OUTPUT
-vivado_hls -f $PATH_TO_SCRIPTS/create_hls.tcl -tclargs $HLS_PROJECT $HLS_SRC $HLS_NN_LIB
