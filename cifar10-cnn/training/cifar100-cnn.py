@@ -296,7 +296,7 @@ if __name__ == '__main__':
     parser.add_argument('--testfile', help='mnist testfile')
     parser.add_argument('--output', help='output for dumping')
     parser.add_argument('--classnum', help='10 for cifar10 or 100 for cifar100',
-                        type=int, default = 10)
+                        type=int, default = 100)
     args = parser.parse_args()
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
