@@ -12,3 +12,5 @@ train_log/
 *.bak
 
 NA/
+
+train_log*/

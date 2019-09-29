@@ -21,7 +21,7 @@ CINCLUDES 	+= -std=c++0x -Wall -Wno-unknown-pragmas -Wall -Wno-unknown-pragmas -
 CXX			= g++
 LDFLAGS		= -lpthread
 
-all: mnist-cnn-1W5A
+all: mnist-cnn-1W2A
 
-mnist-cnn-1W5A:
-	$(CXX) $(CFLAGS) $(CINCLUDES) mnist-cnn-1W2A.cpp -o t_1W5A $(LDFLAGS)
+mnist-cnn-1W2A:
+	$(CXX) $(CFLAGS) $(CINCLUDES) mnist-cnn-1W2A.cpp -o t_1W2A $(LDFLAGS)
