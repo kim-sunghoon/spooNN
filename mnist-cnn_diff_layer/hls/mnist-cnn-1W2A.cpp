@@ -31,42 +31,22 @@ void DoCompute(stream<ap_axis >& in, stream<ap_axis >& out, const unsigned int n
 #pragma HLS INTERFACE s_axilite port=numReps bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
+// from ../training/mnist-cnn-config.h
 #pragma HLS RESOURCE variable=weights0 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=weights0 complete dim=0
-#pragma HLS RESOURCE variable=factorA0 core=RAM_1P_BRAM
-#pragma HLS RESOURCE variable=factorB0 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=factorA0 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=factorB0 complete dim=0
+#pragma HLS ARRAY_PARTITION variable=weights0 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=thresholds0 complete dim=1
 #pragma HLS RESOURCE variable=weights1 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=weights1 complete dim=0
-#pragma HLS RESOURCE variable=factorA1 core=RAM_1P_BRAM
-#pragma HLS RESOURCE variable=factorB1 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=factorA1 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=factorB1 complete dim=0
+#pragma HLS ARRAY_PARTITION variable=weights1 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=thresholds1 complete dim=1
 #pragma HLS RESOURCE variable=weights2 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=weights2 complete dim=0
-#pragma HLS RESOURCE variable=factorA2 core=RAM_1P_BRAM
-#pragma HLS RESOURCE variable=factorB2 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=factorA2 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=factorB2 complete dim=0
+#pragma HLS ARRAY_PARTITION variable=weights2 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=thresholds2 complete dim=1
 #pragma HLS RESOURCE variable=weights3 core=RAM_1P_BRAM
 #pragma HLS ARRAY_PARTITION variable=weights3 complete dim=0
-#pragma HLS RESOURCE variable=factorA3 core=RAM_1P_BRAM
-#pragma HLS RESOURCE variable=factorB3 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=factorA3 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=factorB3 complete dim=0
+#pragma HLS ARRAY_PARTITION variable=thresholds3 complete dim=0
 #pragma HLS RESOURCE variable=weights4 core=RAM_1P_BRAM
 #pragma HLS ARRAY_PARTITION variable=weights4 complete dim=0
-#pragma HLS RESOURCE variable=factorA4 core=RAM_1P_BRAM
-#pragma HLS RESOURCE variable=factorB4 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=factorA4 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=factorB4 complete dim=0
-#pragma HLS RESOURCE variable=weights5 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=weights5 complete dim=0
-#pragma HLS RESOURCE variable=factorA5 core=RAM_1P_BRAM
-#pragma HLS RESOURCE variable=factorB5 core=RAM_1P_BRAM
-#pragma HLS ARRAY_PARTITION variable=factorA5 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=factorB5 complete dim=0
+#pragma HLS ARRAY_PARTITION variable=thresholds4 complete dim=0
 
 #pragma HLS DATAFLOW
 
@@ -90,11 +70,11 @@ CONV2D_ACT_NoP<L0_K, L0_S, L0_Din, L0_Cin, L0_Cout, L0_Ibit, L0_Wbit, L0_Mbit, L
 Monitor<L0_Din/L0_S, L0_Cout, L0_Abit>(conv0, (char*)"log/mon_conv0.log", numReps);
 #endif
 
-stream<ap_uint<L6_Cin*L6_Ibit> > pool0("pool0");
-POOL2D_NoP<L6_K, L6_S, L6_Din, L6_Cin, L6_Ibit>
+stream<ap_uint<L5_Cin*L5_Ibit> > pool0("pool0");
+POOL2D_NoP<L5_K, L5_S, L5_Din, L5_Cin, L5_Ibit>
 (conv0, pool0, numReps);
 #ifdef DEBUG
-Monitor<L6_Din/L6_S, L6_Cin, L6_Ibit>(pool0, (char*)"log/mon_pool0.log", numReps);
+Monitor<L5_Din/L5_S, L5_Cin, L5_Ibit>(pool0, (char*)"log/mon_pool0.log", numReps);
 #endif
 
 stream<ap_uint<L1_Cout*L1_Abit> > conv1("conv1");
@@ -111,30 +91,30 @@ CONV2D_ACT_NoP<L2_K, L2_S, L2_Din, L2_Cin, L2_Cout, L2_Ibit, L2_Wbit, L2_Mbit, L
 Monitor<L2_Din/L2_S, L2_Cout, L2_Abit>(conv2, (char*)"log/mon_conv2.log", numReps);
 #endif
 
-stream<ap_uint<L7_Cin*L7_Ibit> > pool1("pool1");
-POOL2D_NoP<L7_K, L7_S, L7_Din, L7_Cin, L7_Ibit>
+stream<ap_uint<L6_Cin*L6_Ibit> > pool1("pool1");
+POOL2D_NoP<L6_K, L6_S, L6_Din, L6_Cin, L6_Ibit>
 (conv2, pool1, numReps);
 #ifdef DEBUG
-Monitor<L7_Din/L7_S, L7_Cin, L7_Ibit>(pool1, (char*)"log/mon_pool1.log", numReps);
+Monitor<L6_Din/L6_S, L6_Cin, L6_Ibit>(pool1, (char*)"log/mon_pool1.log", numReps);
 #endif
 
-stream<ap_uint<L3_Cout*L3_Abit> > conv3("conv3");
-CONV2D_ACT_NoP<L3_K, L3_S, L3_Din, L3_Cin, L3_Cout, L3_Ibit, L3_Wbit, L3_Mbit, L3_Abit, L3_MVTU_InP, L3_MVTU_OutP, SCALE_BITS, FACTOR_SCALE_BITS>
-(pool1, weights3, factorA3, factorB3, conv3, numReps);
-#ifdef DEBUG
-Monitor<L3_Din/L3_S, L3_Cout, L3_Abit>(conv3, (char*)"log/mon_conv3.log", numReps);
-#endif
+// stream<ap_uint<L3_Cout*L3_Abit> > conv3("conv3");
+// CONV2D_ACT_NoP<L3_K, L3_S, L3_Din, L3_Cin, L3_Cout, L3_Ibit, L3_Wbit, L3_Mbit, L3_Abit, L3_MVTU_InP, L3_MVTU_OutP, SCALE_BITS, FACTOR_SCALE_BITS>
+// (pool1, weights3, factorA3, factorB3, conv3, numReps);
+// #ifdef DEBUG
+// Monitor<L3_Din/L3_S, L3_Cout, L3_Abit>(conv3, (char*)"log/mon_conv3.log", numReps);
+// #endif
 
-stream<ap_uint<L4_OutP*L4_Abit> > dense0("dense0");
-DENSE_ACT<L4_Din, L4_Dout, L4_Ibit, L4_Wbit, L4_Mbit, L4_Abit, L4_InP, L4_OutP, SCALE_BITS, FACTOR_SCALE_BITS>
-(conv3, weights4, factorA4, factorB4, dense0, numReps);
+stream<ap_uint<L3_OutP*L3_Abit> > dense0("dense0");
+DENSE_ACT<L3_Din, L3_Dout, L3_Ibit, L3_Wbit, L3_Mbit, L3_Abit, L3_InP, L3_OutP, SCALE_BITS, FACTOR_SCALE_BITS>
+(conv3, weights3, factorA3, factorB3, dense0, numReps);
 
 stream<ap_uint<L5_OutP*L5_Mbit> > dense1("dense1");
-DENSE_NOACT<L5_Din, L5_Dout, L5_Ibit, L5_Wbit, L5_Mbit, L5_InP, L5_OutP, SCALE_BITS>
-(dense0, weights5, dense1, numReps);
+DENSE_NOACT<L4_Din, L4_Dout, L4_Ibit, L4_Wbit, L4_Mbit, L4_InP, L4_OutP, SCALE_BITS>
+(dense0, weights4, dense1, numReps);
 
 	stream<ap_uint<512> > out_nolast("out_nolast");
-	AppendZeros<10*L5_Mbit, 512, 1> (dense1, out_nolast, numReps);
+	AppendZeros<10*L4_Mbit, 512, 1> (dense1, out_nolast, numReps);
 
 	AddLast<1>(out_nolast, out, numReps);
 }
