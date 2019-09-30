@@ -49,7 +49,7 @@ class Model(ModelDesc):
     def _build_graph(self, inputs):
         image, label = inputs
 
-        """Add a single channel here"""
+        """Add a single channel here Since MNIST has 2 channels """
         image = tf.expand_dims(image, 3)
 
         image = image*256

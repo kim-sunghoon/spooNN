@@ -2,8 +2,7 @@
 // Cycles per IFM: 28224.0
 #define L0_K 3
 #define L0_S 1
-#define L0_Din_W 28
-#define L0_Din_H 28
+#define L0_Din 28
 #define L0_Cin 1
 #define L0_Cout 32
 #define L0_Ibit 8
@@ -18,8 +17,7 @@
 // Cycles per IFM: 28224.0
 #define L1_K 3
 #define L1_S 1
-#define L1_Din_W 14
-#define L1_Din_H 14
+#define L1_Din 14
 #define L1_Cin 32
 #define L1_Cout 32
 #define L1_Ibit 5
@@ -34,8 +32,7 @@
 // Cycles per IFM: 28224.0
 #define L2_K 3
 #define L2_S 1
-#define L2_Din_W 14
-#define L2_Din_H 14
+#define L2_Din 14
 #define L2_Cin 32
 #define L2_Cout 32
 #define L2_Ibit 5
@@ -72,8 +69,7 @@
 // Cycles per IFM: 1260.0
 #define L5_K 2
 #define L5_S 2
-#define L5_Din_W 28
-#define L5_Din_H 28
+#define L5_Din 28
 #define L5_Cin 32
 #define L5_Ibit 5
 #define L5_SWU_OutP 1
@@ -82,8 +78,7 @@
 // Cycles per IFM: 336.0
 #define L6_K 2
 #define L6_S 2
-#define L6_Din_W 14
-#define L6_Din_H 14
+#define L6_Din 14
 #define L6_Cin 32
 #define L6_Ibit 5
 #define L6_SWU_OutP 1
@@ -93,17 +88,23 @@
 #define HIGH_PREC_SCALE_BITS 22
 
 // #pragma HLS RESOURCE variable=weights0 core=RAM_1P_BRAM
-// #pragma HLS ARRAY_PARTITION variable=weights0 complete dim=1
-// #pragma HLS ARRAY_PARTITION variable=factorA0 complete dim=1
-// #pragma HLS ARRAY_PARTITION variable=factorB0 complete dim=1
+// #pragma HLS ARRAY_PARTITION variable=weights0 complete dim=0
+// #pragma HLS RESOURCE variable=factorA0 core=RAM_1P_BRAM
+// #pragma HLS RESOURCE variable=factorB0 core=RAM_1P_BRAM
+// #pragma HLS ARRAY_PARTITION variable=factorA0 complete dim=0
+// #pragma HLS ARRAY_PARTITION variable=factorB0 complete dim=0
 // #pragma HLS RESOURCE variable=weights1 core=RAM_1P_BRAM
-// #pragma HLS ARRAY_PARTITION variable=weights1 complete dim=1
-// #pragma HLS ARRAY_PARTITION variable=factorA1 complete dim=1
-// #pragma HLS ARRAY_PARTITION variable=factorB1 complete dim=1
+// #pragma HLS ARRAY_PARTITION variable=weights1 complete dim=0
+// #pragma HLS RESOURCE variable=factorA1 core=RAM_1P_BRAM
+// #pragma HLS RESOURCE variable=factorB1 core=RAM_1P_BRAM
+// #pragma HLS ARRAY_PARTITION variable=factorA1 complete dim=0
+// #pragma HLS ARRAY_PARTITION variable=factorB1 complete dim=0
 // #pragma HLS RESOURCE variable=weights2 core=RAM_1P_BRAM
-// #pragma HLS ARRAY_PARTITION variable=weights2 complete dim=1
-// #pragma HLS ARRAY_PARTITION variable=factorA2 complete dim=1
-// #pragma HLS ARRAY_PARTITION variable=factorB2 complete dim=1
+// #pragma HLS ARRAY_PARTITION variable=weights2 complete dim=0
+// #pragma HLS RESOURCE variable=factorA2 core=RAM_1P_BRAM
+// #pragma HLS RESOURCE variable=factorB2 core=RAM_1P_BRAM
+// #pragma HLS ARRAY_PARTITION variable=factorA2 complete dim=0
+// #pragma HLS ARRAY_PARTITION variable=factorB2 complete dim=0
 // #pragma HLS RESOURCE variable=weights3 core=RAM_1P_BRAM
 // #pragma HLS ARRAY_PARTITION variable=weights3 complete dim=0
 // #pragma HLS RESOURCE variable=factorA3 core=RAM_1P_BRAM
