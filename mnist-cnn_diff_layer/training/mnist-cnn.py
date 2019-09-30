@@ -38,7 +38,7 @@ MONITOR = 1
 IMAGE_SIZE = 28
 
 BITW = 1
-BITA = 2
+BITA = 5
 BITG = 32
 
 class Model(ModelDesc):
