@@ -24,4 +24,4 @@ LDFLAGS		= -lpthread
 all: mnist-cnn-1W5A
 
 mnist-cnn-1W5A:
-	$(CXX) $(CFLAGS) $(CINCLUDES) mnist-cnn-1W5A.cpp -o t_1W5A $(LDFLAGS)
+	$(CXX) $(CFLAGS) $(CINCLUDES) cifar10-cnn-1W5A.cpp -o t_1W5A $(LDFLAGS)

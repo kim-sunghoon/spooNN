@@ -33,7 +33,7 @@ from dorefa import get_dorefa
 from evaluate import *
 from loader import loader
 
-MONITOR = 1
+MONITOR = 0
 
 IMAGE_SIZE = 32
 
@@ -273,8 +273,8 @@ def dump_weights(meta, model, output):
             
             achieved_FMpS = target_frequency/max_cycles
 
-            generateConfig(layers_list, 'cifar10-cnn-config_W1A5.h')
-            genereateHLSparams(layers_list, network_model, 'cifar10-cnn-params_W1A5.h', fw)
+            generateConfig(layers_list, 'cifar10-cnn-config_W{}A{}.h'.format(BITW, BITA))
+            genereateHLSparams(layers_list, network_model, 'cifar10-cnn-params_W{}A{}.h'.format(BITW, BITA), fw)
 
             print('|---------------------------------------------------------|')
             print('target_FMpS: ' + str(target_FMpS) )
