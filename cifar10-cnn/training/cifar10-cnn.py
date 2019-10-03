@@ -35,10 +35,10 @@ from loader import loader
 
 MONITOR = 1
 
-IMAGE_SIZE = 30
+IMAGE_SIZE = 32
 
-BITW = 4
-BITA = 4
+BITW = 1
+BITA = 5
 BITG = 32
 
 class Model(ModelDesc):
@@ -99,12 +99,11 @@ class Model(ModelDesc):
                       .Conv2D('conv1', out_channel=64)
                       .apply(fg)
                       .BatchNorm('bn1').apply(activate).apply(monitor, 'conv1_out')
-                      .MaxPooling('pool1', 2).apply(monitor, 'pool1_out')
 
                       .Conv2D('conv2', out_channel=128)
                       .apply(fg)
                       .BatchNorm('bn2').apply(activate).apply(monitor, 'conv2_out')
-                      .MaxPooling('pool2', 2).apply(monitor, 'pool2_out')
+                      .MaxPooling('pool1', 2).apply(monitor, 'pool1_out')
 
                       .FullyConnected('fc0', out_dim=128, use_bias=False, activation=tf.nn.relu).apply(monitor, 'fc0_out')
                       .FullyConnected('fc1', use_bias=False, out_dim=self.cifar_classnum, nl=tf.identity).apply(monitor, 'fc1_out')
@@ -138,7 +137,6 @@ def get_data(train_or_test, classnum):
         ds = dataset.Cifar100(train_or_test)
     if isTrain:
         augmentors = [
-            imgaug.RandomCrop((30,30)),
             imgaug.Flip(horiz=True),
             imgaug.Brightness(63),
             imgaug.Contrast((0.2, 1.8)),
@@ -146,7 +144,6 @@ def get_data(train_or_test, classnum):
         ]
     else:
         augmentors = [
-            imgaug.RandomCrop((30,30)),
             imgaug.MeanVarianceNormalize(all_channel=True) 
         ]
     ds = AugmentImageComponent(ds, augmentors)
@@ -176,7 +173,7 @@ def get_config(args):
 
 def run_test(weights_file, test_file, classnum):
     if MONITOR == 1:
-        monitor_names = ['image_out', 'conv0_out', 'pool0_out', 'conv1_out', 'pool1_out', 'conv2_out', 'pool2_out' , 'fc0_out', 'fc2_out']
+        monitor_names = ['image_out', 'conv0_out', 'pool0_out', 'conv1_out', 'pool1_out', 'conv2_out', 'fc0_out', 'fc1_out']
     else:
         monitor_names = []
     output_names = ['prob']
@@ -272,14 +269,14 @@ def dump_weights(meta, model, output):
 
             target_frequency = 200000000
             target_FMpS = 300000
-            non_quantized_layers = ['conv0/Conv2D', 'fc2/MatMul']
+            non_quantized_layers = ['conv0/Conv2D', 'fc1/MatMul']
 
             json_out, layers_list, max_cycles = generateLayers(sess, BITA, BITW, non_quantized_layers, target_frequency, target_FMpS)
             
             achieved_FMpS = target_frequency/max_cycles
 
-            generateConfig(layers_list, 'cifar10-cnn-config_W4A4.h')
-            genereateHLSparams(layers_list, network_model, 'cifar10-cnn-params_W4A4.h', fw)
+            generateConfig(layers_list, 'cifar10-cnn-config_W1A5.h')
+            genereateHLSparams(layers_list, network_model, 'cifar10-cnn-params_W1A5.h', fw)
 
             print('|---------------------------------------------------------|')
             print('target_FMpS: ' + str(target_FMpS) )
