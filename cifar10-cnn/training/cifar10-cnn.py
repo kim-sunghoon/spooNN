@@ -55,7 +55,6 @@ class Model(ModelDesc):
 
 
         fw, fa, fg = get_dorefa(BITW, BITA, BITG)
-        image = image / 4.0    # just to make range smaller
 
         old_get_variable = tf.get_variable
 
@@ -88,24 +87,21 @@ class Model(ModelDesc):
                 return fa(tf.nn.relu(x))
 
         with remap_variables(new_get_variable), \
-             argscope(Conv2D, kernel_shape=3, use_bias=False):
+             argscope(Conv2D, kernel_shape=3, use_bias=False, nl=tf.identity, out_channel=32):
             logits = (LinearWrap(image).apply(monitor, 'image_out')
-                      .Conv2D('conv0', out_channel=32)
+                      .Conv2D('conv0')
                       .apply(fg)
                       .BatchNorm('bn0')
                       .apply(activate).apply(monitor, 'conv0_out')
                       .MaxPooling('pool0', 2).apply(monitor, 'pool0_out')
-
-                      .Conv2D('conv1', out_channel=64)
+                      .Conv2D('conv1')
                       .apply(fg)
                       .BatchNorm('bn1').apply(activate).apply(monitor, 'conv1_out')
-
-                      .Conv2D('conv2', out_channel=128)
+                      .Conv2D('conv2')
                       .apply(fg)
                       .BatchNorm('bn2').apply(activate).apply(monitor, 'conv2_out')
                       .MaxPooling('pool1', 2).apply(monitor, 'pool1_out')
-
-                      .FullyConnected('fc0', out_dim=128, use_bias=False, activation=tf.nn.relu).apply(monitor, 'fc0_out')
+                      .FullyConnected('fc0', use_bias=False, out_dim=512, nl=tf.identity).apply(activate).apply(monitor, 'fc0_out')
                       .FullyConnected('fc1', use_bias=False, out_dim=self.cifar_classnum, nl=tf.identity).apply(monitor, 'fc1_out')
                       ())
 
@@ -173,7 +169,7 @@ def get_config(args):
 
 def run_test(weights_file, test_file, classnum):
     if MONITOR == 1:
-        monitor_names = ['image_out', 'conv0_out', 'pool0_out', 'conv1_out', 'pool1_out', 'conv2_out', 'fc0_out', 'fc1_out']
+        monitor_names = ['image_out', 'conv0_out', 'pool0_out', 'conv1_out', 'conv2_out', 'pool1_out', 'fc0_out', 'fc1_out']
     else:
         monitor_names = []
     output_names = ['prob']
@@ -193,10 +189,10 @@ def run_test(weights_file, test_file, classnum):
         NUM = 10000
 
     l = loader()
-    l.load_libsvm_data(test_file, num_samples=NUM, num_features=IMAGE_SIZE*IMAGE_SIZE, one_hot=0, classes=None)
-    images = np.zeros((NUM, IMAGE_SIZE, IMAGE_SIZE))
-    for i in range(0, NUM):
-        images[i,:,:] = np.divide(l.a[i], 256.0).reshape((IMAGE_SIZE,IMAGE_SIZE))
+    l.load_cifar(test_file, num_samples=NUM, classes=classnum)
+    images = np.zeros((NUM, IMAGE_SIZE, IMAGE_SIZE, 3))
+    for i, ret in enumerate(l.ret):
+        images[i,:,:,:] = ret[0]
 
     outputs = predictor([images])
 
@@ -204,8 +200,10 @@ def run_test(weights_file, test_file, classnum):
 
     correct_count = 0
     maxes = np.argmax(prob, axis=1)
-    for i in range(0, NUM):  
-        if l.b[i] == maxes[i]:
+    ## label and prediction
+    for i, ret in enumerate(l.ret):  
+        print("Golden: {}, predicted: {}".format(ret[1], maxes[i]))
+        if ret[1] == maxes[i]:
             correct_count += 1
 
     print(str(correct_count) + ' correct out of ' + str(NUM))

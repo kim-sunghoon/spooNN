@@ -16,33 +16,62 @@
 #*************************************************************************
 
 import numpy as np
+import six
+import pickle
+import argparse
 
 class loader:
-	def __init__(self):
-		self.num_samples = 0;
-		self.num_features = 0;
+    def __init__(self):
+        self.num_samples = 0;
+        self.ret = []
 
-		self.a = None;
-		self.b = None;
+    def load_cifar(self, path_to_file, num_samples, classes = 10):
+        assert classes == 10 or classes == 100
+        fo = open(path_to_file, 'rb')
 
-	def load_libsvm_data(self, path_to_file, num_samples, num_features, one_hot, classes):
-		self.num_samples = num_samples
-		self.num_features = num_features
+        if six.PY3:
+            dic = pickle.load(fo, encoding = 'bytes')
+        else:
+            dic = pickle.load(fo)
 
-		self.a = np.zeros((self.num_samples, self.num_features))
-		if one_hot == 0:
-			self.b = np.zeros(self.num_samples)
-		else:
-			self.b = np.zeros(( self.num_samples, len(classes) ))
+        data = dic[b'data']
 
-		f = open(path_to_file, 'r')
-		for i in range(0, self.num_samples):
-			line = f.readline()
-			items = line.split()
-			if one_hot == 0:
-				self.b[i] = float(items[0])
-			else:
-				self.b[i, classes.index(items[0])] = 1
-			for j in range(1, len(items)):
-				item = items[j].split(':')
-				self.a[i, int(item[0])] = float(item[1])
+        #  img_filename = dic[b'filenames']
+
+        if classes == 10:
+            label = dic[b'labels']
+        else: 
+            label = dic[b'fine_labels']
+        fo.close()
+
+        for k in range(num_samples):
+            img = data[k].reshape(3, 32, 32)
+            img = np.transpose(img, [1, 2, 0])
+            #  self.ret.append([img, label[k], img_filename])
+            self.ret.append([img, label[k]])
+        
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--testfile', help='cifar testfile',
+            default = 'cifar10_data/cifar-10-batches-py/test_batch'
+            )
+    parser.add_argument('--num_samples', help='num samples to visualize, maximum is 10000',
+            default = 10000
+            )
+    parser.add_argument('--num_classes', help='num classes, cifar10 for 10 or cifar100 for 100',
+            default = 10
+            )
+    args = parser.parse_args()
+    import cv2
+
+    l = loader()
+    l.load_cifar(path_to_file = args.testfile, num_samples = args.num_samples, classes = args.num_classes)
+    
+    for i, ret in enumerate(l.ret):
+        img = ret[0]
+        label = ret[1]
+        #  img_filename = ret[2]
+        cv2.imwrite("fig/{:04d}.jpg".format(i), img)
+        #  print(label, img_filename)
+        print(label)
