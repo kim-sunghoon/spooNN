@@ -64,9 +64,11 @@ void DoCompute(stream<ap_axis >& in, stream<ap_axis >& out, const unsigned int n
 
 
 #pragma HLS DATAFLOW
-
-	// 2 rows of 32 row image per line -> per image 16 lines
-	const unsigned int NumLinesPerRep = 16;
+    // height 32, width 32
+    // pixel_bits = 8*3 -- 8bit and 3 channels
+    // pixels_per_line = 384/piexl_bits = 16
+	// num lines = int((height*width)/pixels_per_line = 32*32/16 == 32*2 = 64 
+	const unsigned int NumLinesPerRep = 64;
 
 	stream<ap_uint<384> > in_stream_extract("in_stream_extract");
 	ExtractPixels<384, NumLinesPerRep> (in, in_stream_extract, numReps);
@@ -136,45 +138,102 @@ DENSE_NOACT<L4_Din, L4_Dout, L4_Ibit, L4_Wbit, L4_Mbit, L4_InP, L4_OutP, SCALE_B
 
 // TESTBENCH
 #ifdef TESTBENCH
-#include "loader.h"
 #include <iostream>
+#include <fstream>
+#include <string>
+
+#ifdef REAL_IMAGE
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui/highgui.hpp>
+using namespace cv;
+#endif
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-#define NUM_SAMPLES 1
+    const unsigned NUM_SAMPLES=1;
 
-	char* pathToDataset;
-	if (argc != 2) {
-		cout << "Usage: ./t <pathToDataset>" << endl;
-		return 0;
-	}
-	else {
-		pathToDataset = argv[1];
-}
 
-	loader load = loader();
+#ifdef REAL_IMAGE
+    string imagename("0000.jpg");
+    Mat im;
+    im = imread(imagename.c_str(), IMREAD_COLOR);
 
-	load.load_libsvm_data(pathToDataset, NUM_SAMPLES, 784, 10);
-	load.x_normalize(0, 'r');
+    unsigned height = im.rows;
+    unsigned width = im.cols;
+#else 
+    unsigned height = 32;
+    unsigned width = 32;
 
-	// One line will contain 448 useful bits
-	const unsigned int data_points_per_line = 448/L0_Ibit;
-	// Per image, we need 14 lines
-	const unsigned int buffer_size = NUM_SAMPLES*14;
-	stream<ap_axis > inputStream;
+#endif
+    cout << "Image height: " << height << endl;
+    cout << "Image width:  " << width << endl;
+
+    const unsigned pixel_bits = L0_Ibit*L0_Cin;
+    const unsigned pixels_per_line = 384/pixel_bits;
+    const unsigned buffer_size = (NUM_SAMPLES*height*width)/pixels_per_line;
+	stream<ap_axis > inputStream("inputStream");
+
+    cout << "pixels_per_line: " << pixels_per_line << endl;
+    cout << "buffer_size: " << buffer_size << endl;
 	
+#ifdef REAL_IMAGE
+    uint8_t* pixel_ptr = (uint8_t*)im.data;
+    unsigned channels = im.channels();
+#else
+    uint8_t* pixel_ptr = (uint8_t*)malloc(3*height*width);
+    unsigned channels = 3;
+    unsigned k = 0;
+    for (unsigned y = 0; y < height; y++){
+        for (unsigned x = 0; x < width; x++){
+            for (unsigned c = 0; c < channels; c++){
+                pixel_ptr[y*width*channels + x*channels + c] = (k++)%256;  
+            } 
+        }  
+    }
+
+#endif
+
 	unsigned int index = 0;
-	for (unsigned int i = 0; i < buffer_size; i++) {
-		ap_axis temp;
-		for (unsigned int j = 0; j < data_points_per_line; j++) {
-			temp.data( L0_Ibit*(j+1)-1, L0_Ibit*j ) = ((unsigned int)(load.x[index++]*255.0));
-		}
-		cout << "inputStream[" << i << "]: " << hex << temp.data << dec << endl;
+    unsigned word;
 
-		inputStream.write(temp);
-	}
-	
+    for (unsigned i = 0; i < NUM_SAMPLES; i++){
+        word = 0;
+        ap_axis temp;
+        for (unsigned y = 0; y < height; y++){
+            for (unsigned x = 0; x < width; x++){
+                unsigned red = (unsigned)pixel_ptr[y*width*channels + x*channels];
+                unsigned green = (unsigned)pixel_ptr[y*width*channels + x*channels + 1];
+                unsigned blue = (unsigned)pixel_ptr[y*width*channels + x*channels + 2];
+                unsigned rgb = (blue << 16) + (green << 8) + red;
+
+                temp.data(pixel_bits*(word+1)-1, pixel_bits*word) = rgb;
+
+                if (word == pixels_per_line-1){
+                    inputStream.write(temp);
+                    word = 0;
+                    temp.data = 0;
+                    index++;
+                
+                }
+                else {
+                    word++; 
+                }
+            
+            }
+        
+        
+        }  
+    }
+
+#ifndef REAL_IMAGE
+    free(pixel_ptr);
+#endif
+
+    cout << "index: " << index << endl;
+    cout << "word: " << word << endl;
+
 	stream<ap_axis > outputStream;
 
 	DoCompute(inputStream, outputStream, NUM_SAMPLES);
@@ -202,9 +261,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		cout << "prediction: " << prediction << endl;
-		if (load.y[i*10 + prediction] == 1)
-			count_trues++;
 	}
-	cout << count_trues << " correct out of " << NUM_SAMPLES << endl;
+	// cout << count_trues << " correct out of " << NUM_SAMPLES << endl;
 }
 #endif
