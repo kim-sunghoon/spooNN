@@ -131,18 +131,18 @@ def get_data(train_or_test, classnum):
         ds = dataset.Cifar10(train_or_test)
     else:
         ds = dataset.Cifar100(train_or_test)
-    if isTrain:
-        augmentors = [
-            imgaug.Flip(horiz=True),
-            imgaug.Brightness(63),
-            imgaug.Contrast((0.2, 1.8)),
-            imgaug.MeanVarianceNormalize(all_channel=True) 
-        ]
-    else:
-        augmentors = [
-            imgaug.MeanVarianceNormalize(all_channel=True) 
-        ]
-    ds = AugmentImageComponent(ds, augmentors)
+    #  if isTrain:
+    #      augmentors = [
+    #          imgaug.Flip(horiz=True),
+    #          imgaug.Brightness(63),
+    #          imgaug.Contrast((0.2, 1.8)),
+    #          imgaug.MeanVarianceNormalize(all_channel=True)
+    #      ]
+    #  else:
+    #      augmentors = [
+    #          imgaug.MeanVarianceNormalize(all_channel=True)
+    #      ]
+    #  ds = AugmentImageComponent(ds, augmentors)
     ds = BatchData(ds, 256, remainder=not isTrain)
     return ds
 
