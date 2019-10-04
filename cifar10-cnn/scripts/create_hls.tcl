@@ -39,7 +39,7 @@ set config_proj_part "xc7z020clg400-1"
 set config_clkperiod 10
 
 open_project $proj_name
-add_files "${hls_src}/mnist-cnn-1W5A.cpp" -cflags "-std=c++0x -I${hls_nn_lib}"
+add_files "${hls_src}/cifar10-cnn-1W5A.cpp" -cflags "-std=c++0x -I${hls_nn_lib}"
 set_top $config_toplevelfxn
 open_solution sol1
 set_part $config_proj_part

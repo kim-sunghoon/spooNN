@@ -273,8 +273,8 @@ def dump_weights(meta, model, output):
             
             achieved_FMpS = target_frequency/max_cycles
 
-            generateConfig(layers_list, 'cifar10-cnn-config_W{}A{}.h'.format(BITW, BITA))
-            genereateHLSparams(layers_list, network_model, 'cifar10-cnn-params_W{}A{}.h'.format(BITW, BITA), fw)
+            generateConfig(layers_list, 'cifar10-cnn-config-{}W{}A.h'.format(BITW, BITA))
+            genereateHLSparams(layers_list, network_model, 'cifar10-cnn-params-{}W{}A.h'.format(BITW, BITA), fw)
 
             print('|---------------------------------------------------------|')
             print('target_FMpS: ' + str(target_FMpS) )
