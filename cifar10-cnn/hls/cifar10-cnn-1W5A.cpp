@@ -17,6 +17,7 @@
 
 
 #define TESTBENCH
+#define REAL_IMAGE
 // #define DEBUG
 
 #define AP_INT_MAX_W 16384
